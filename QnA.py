@@ -17,6 +17,10 @@ def check_for_header(line):
     return line.strip()[0].isalpha()
 
 
+def check_for_numeric(line):
+    return line.strip()[0].isnumeric()
+
+
 def list_all():
     for header in headers:
         for i in range(len(headers[header])):
@@ -102,12 +106,25 @@ with open(sys.argv[1]) as f:
             while check_for_len(line):
                 if check_for_len(line) and check_for_dash(line):
                     questions = []
-                    while check_for_len(line) and not check_for_star(line):
+                    while (check_for_len(line) and not check_for_star(line) and
+                    not check_for_numeric(line)):
                         questions.append(line.strip())
                         line = next(f)
                     question = " ".join(questions)
                     headers[header][0][question] = ''
                 if check_for_len(line) and check_for_star(line):
+                    answers = []
+                    try:
+                        while check_for_len(line) and not check_for_dash(line):
+                            answers.append(line.strip())
+                            line = next(f)
+                    except StopIteration:
+                        answers = " ".join(answers)
+                        headers[header][0][question] = answers
+                        break
+                    answers = " ".join(answers)
+                    headers[header][0][question] = answers
+                if check_for_len(line) and check_for_numeric(line):
                     answers = []
                     try:
                         while check_for_len(line) and not check_for_dash(line):
