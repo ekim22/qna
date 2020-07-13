@@ -79,7 +79,7 @@ def default():
     my_printer = pp.PrettyPrinter(indent=2)
     my_answers = {}
     for header in headers:
-        print("= " * len(header) + header.upper() + " =" * len(header))
+        print("=" * len(header) + header.upper() + "=" * len(header))
         acknowledge = input("Skip? (y/n) ")
         if acknowledge == 'n' or not acknowledge:
             for index, question in enumerate(headers[header][0].keys()):
@@ -87,8 +87,6 @@ def default():
                 ans = input()
                 my_answers[question] = ans
     my_printer.pprint(my_answers)
-    pose_questions()
-                
 
 
 
@@ -139,9 +137,9 @@ with open(sys.argv[1]) as f:
 
 
 
-while False:
+while True:
     print("Main Menu \n1. All \n2. Questions \n3. Answers \n4. Q&A's \n5."
-            "Headers \n6. Q&A per Header\n")
+            " Headers \n6. Q&A per Header\n")
     choice = input("Selection: ")
     if choice == '1':
         list_all()
