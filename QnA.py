@@ -14,62 +14,62 @@ def check_for_star(line):
     return line.strip()[0] == "*"
 
 
-def check_for_header(line):
+def check_for_topic(line):
     return line.strip()[0].isalpha()
 
 
 def check_for_numeric(line):
     return line.strip()[0].isnumeric()
 
-def print_header(header):
+def print_topic(topic):
     term_columns = shutil.get_terminal_size()[0]
     print("=" * term_columns)
     print("|" + (term_columns - 2) * " " + "|")
-    print("|" + (term_columns - len(header))//2 * " " + header.upper() +
-          (term_columns - 3 - len(header))//2 * " " + "|")
+    print("|" + (term_columns - len(topic))//2 * " " + topic.upper() +
+          (term_columns - 3 - len(topic))//2 * " " + "|")
     print("|" + (term_columns - 2) * " " + "|")
     print("=" * term_columns)
 
 
 def list_all():
-    for header in headers:
-        for i in range(len(headers[header])):
-            pp.pprint(headers[header][i])
+    for topic in topics:
+        for i in range(len(topics[topic])):
+            pp.pprint(topics[topic][i])
 
 
-def list_headers():
-    for header in headers:
-        print_header(header)
+def list_topics():
+    for topic in topics:
+        print_topic(topic)
 
 
 def list_questions_and_answers():
-    for header in headers:
-        print_header(header)
-        for question, answer in headers[header][0].items():
+    for topic in topics:
+        print_topic(topic)
+        for question, answer in topics[topic][0].items():
             print(question)
             print("   " + answer)
             print("\n")
 
 
-def list_qna_for_header():
+def list_qna_for_topic():
     my_printer = pp.PrettyPrinter(indent=4)
-    for header in headers:
+    for topic in topics:
         print(topic)
-        for question, answer in headers[topic][0].items():
+        for question, answer in topics[topic][0].items():
             print("Q: " + question[2:])
             my_printer.pprint("A: " + answer[2:])
         print("\n")
 
 
 def list_questions():
-    for header in headers:
-        for question, answer in headers[header][0].items():
+    for topic in topics:
+        for question, answer in topics[topic][0].items():
             print("Q: " + question)
 
 
 def list_answers():
-    for header in headers:
-        for question, answer in headers[header][0].items():
+    for topic in topics:
+        for question, answer in topics[topic][0].items():
             print("A:" + answer)
 
 
@@ -82,15 +82,15 @@ def add_answers():
             line = next(f)
     except StopIteration:
         answers = " ".join(answers)
-        headers[header][0][question] = answers
+        topics[topic][0][question] = answers
         end_of_file = True
     if not end_of_file:
         answers = " ".join(answers)
-        headers[header][0][question] = answers
+        topics[topic][0][question] = answers
 
 
 def pose_questions():
-    # Default behavior should be list first header and its set of questions,
+    # Default behavior should be list first topic and its set of questions,
     # allow inputting an answer, present next question and so on until all sets
     # are done.
     print("Select mode \n1. Default")
@@ -104,28 +104,28 @@ def pose_questions():
 def default():
     my_printer = pp.PrettyPrinter(indent=2)
     my_answers = {}
-    for header in headers:
-        print("=" * len(header) + header.upper() + "=" * len(header))
+    for topic in topics:
+        print("=" * len(topic) + topic.upper() + "=" * len(topic))
         acknowledge = input("Skip? (y/n) ")
         if acknowledge == "n" or not acknowledge:
-            for index, question in enumerate(headers[header][0].keys()):
+            for index, question in enumerate(topics[topic][0].keys()):
                 print(f"Question {index + 1}: {question}")
                 ans = input()
                 my_answers[question] = ans
     my_printer.pprint(my_answers)
 
 
-headers = {}  # A class should be made for a file and this should be an attr.
+topics = {}  # A class should be made for a file and this should be an attr.
 
 # All this stuff should go in a function and be decomposed where similar, if
 # possible
 with open(sys.argv[1]) as f:
     for line in f:
         end_of_file = False
-        if check_for_len(line) and check_for_header(line):
-            header = line.strip()
-            headers[header] = []
-            headers[header].append({})
+        if check_for_len(line) and check_for_topic(line):
+            topic = line.strip()
+            topics[topic] = []
+            topics[topic].append({})
             line = next(f)
             while check_for_len(line) and not end_of_file:
                 if check_for_len(line) and check_for_dash(line):
@@ -138,7 +138,7 @@ with open(sys.argv[1]) as f:
                         questions.append(line.strip())
                         line = next(f)
                     question = " ".join(questions)
-                    headers[header][0][question] = ""
+                    topics[topic][0][question] = ""
                 if check_for_len(line) and check_for_star(line):
                     add_answers()
                 elif check_for_len(line) and check_for_numeric(line):
@@ -148,7 +148,7 @@ with open(sys.argv[1]) as f:
 while True:
     print(
         "Main Menu \n1. All \n2. Questions \n3. Answers \n4. Q&A's \n5."
-        " Headers \n6. Q&A per Header\n"
+        " topics \n6. Q&A per topic\n"
     )
     choice = input("Selection: ")
     if choice == "1":
@@ -160,13 +160,11 @@ while True:
     elif choice == "4":
         list_questions_and_answers()
     elif choice == "5":
-        list_headers()
+        list_topics()
     elif choice == "6":
-        list_qna_for_header()
+        list_qna_for_topic()
     else:
         break
 
 while True:
     pose_questions()
-
-# list_questions_and_answers()
