@@ -1,16 +1,17 @@
 import sys
 import pprint as pp
 
+
 def check_for_len(line):
     return len(line.strip())
 
 
 def check_for_dash(line):
-    return line.strip()[0] == '-'
+    return line.strip()[0] == "-"
 
 
 def check_for_star(line):
-    return line.strip()[0] == '*'
+    return line.strip()[0] == "*"
 
 
 def check_for_header(line):
@@ -63,17 +64,33 @@ def list_answers():
             print("A:" + answer)
 
 
+def add_answers():
+    global end_of_file, line, question
+    answers = []
+    try:
+        while check_for_len(line) and not check_for_dash(line):
+            answers.append(line.strip())
+            line = next(f)
+    except StopIteration:
+        answers = " ".join(answers)
+        headers[header][0][question] = answers
+        end_of_file = True
+    if not end_of_file:
+        answers = " ".join(answers)
+        headers[header][0][question] = answers
+
+
 def pose_questions():
     # Default behavior should be list first header and its set of questions,
     # allow inputting an answer, present next question and so on until all sets
     # are done.
     print("Select mode \n1. Default")
     mode = input()
-    if mode == '1':
+    if mode == "1":
         default()
     elif not mode:
         sys.exit(0)
-    
+
 
 def default():
     my_printer = pp.PrettyPrinter(indent=2)
@@ -81,7 +98,7 @@ def default():
     for header in headers:
         print("=" * len(header) + header.upper() + "=" * len(header))
         acknowledge = input("Skip? (y/n) ")
-        if acknowledge == 'n' or not acknowledge:
+        if acknowledge == "n" or not acknowledge:
             for index, question in enumerate(headers[header][0].keys()):
                 print(f"Question {index + 1}: {question}")
                 ans = input()
@@ -89,69 +106,53 @@ def default():
     my_printer.pprint(my_answers)
 
 
-
-headers = {} # A class should be made for a file and this should be an attr.
+headers = {}  # A class should be made for a file and this should be an attr.
 
 # All this stuff should go in a function and be decomposed where similar, if
 # possible
 with open(sys.argv[1]) as f:
     for line in f:
+        end_of_file = False
         if check_for_len(line) and check_for_header(line):
             header = line.strip()
             headers[header] = []
             headers[header].append({})
             line = next(f)
-            while check_for_len(line):
+            while check_for_len(line) and not end_of_file:
                 if check_for_len(line) and check_for_dash(line):
                     questions = []
-                    while (check_for_len(line) and not check_for_star(line) and
-                    not check_for_numeric(line)):
+                    while (
+                        check_for_len(line)
+                        and not check_for_star(line)
+                        and not check_for_numeric(line)
+                    ):
                         questions.append(line.strip())
                         line = next(f)
                     question = " ".join(questions)
-                    headers[header][0][question] = ''
+                    headers[header][0][question] = ""
                 if check_for_len(line) and check_for_star(line):
-                    answers = []
-                    try:
-                        while check_for_len(line) and not check_for_dash(line):
-                            answers.append(line.strip())
-                            line = next(f)
-                    except StopIteration:
-                        answers = " ".join(answers)
-                        headers[header][0][question] = answers
-                        break
-                    answers = " ".join(answers)
-                    headers[header][0][question] = answers
-                if check_for_len(line) and check_for_numeric(line):
-                    answers = []
-                    try:
-                        while check_for_len(line) and not check_for_dash(line):
-                            answers.append(line.strip())
-                            line = next(f)
-                    except StopIteration:
-                        answers = " ".join(answers)
-                        headers[header][0][question] = answers
-                        break
-                    answers = " ".join(answers)
-                    headers[header][0][question] = answers
-
+                    add_answers()
+                elif check_for_len(line) and check_for_numeric(line):
+                    add_answers()
 
 
 while True:
-    print("Main Menu \n1. All \n2. Questions \n3. Answers \n4. Q&A's \n5."
-            " Headers \n6. Q&A per Header\n")
+    print(
+        "Main Menu \n1. All \n2. Questions \n3. Answers \n4. Q&A's \n5."
+        " Headers \n6. Q&A per Header\n"
+    )
     choice = input("Selection: ")
-    if choice == '1':
+    if choice == "1":
         list_all()
-    elif choice == '2':
+    elif choice == "2":
         list_questions()
-    elif choice == '3':
+    elif choice == "3":
         list_answers()
-    elif choice == '4':
+    elif choice == "4":
         list_questions_and_answers()
-    elif choice == '5':
+    elif choice == "5":
         list_headers()
-    elif choice == '6':
+    elif choice == "6":
         list_qna_for_header()
     else:
         break
@@ -160,4 +161,3 @@ while True:
     pose_questions()
 
 # list_questions_and_answers()
-
