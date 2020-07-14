@@ -1,4 +1,4 @@
-import sys
+import sys, shutil
 import pprint as pp
 
 
@@ -21,6 +21,15 @@ def check_for_header(line):
 def check_for_numeric(line):
     return line.strip()[0].isnumeric()
 
+def print_header(header):
+    term_columns = shutil.get_terminal_size()[0]
+    print("=" * term_columns)
+    print("|" + (term_columns - 2) * " " + "|")
+    print("|" + (term_columns - len(header))//2 * " " + header.upper() +
+          (term_columns - 3 - len(header))//2 * " " + "|")
+    print("|" + (term_columns - 2) * " " + "|")
+    print("=" * term_columns)
+
 
 def list_all():
     for header in headers:
@@ -30,21 +39,21 @@ def list_all():
 
 def list_headers():
     for header in headers:
-        print(header)
+        print_header(header)
 
 
 def list_questions_and_answers():
     for header in headers:
+        print_header(header)
         for question, answer in headers[header][0].items():
+            print(question)
+            print("   " + answer)
             print("\n")
-            print(header)
-            print("Q: " + question)
-            print("A: " + answer)
 
 
 def list_qna_for_header():
     my_printer = pp.PrettyPrinter(indent=4)
-    for topic in headers:
+    for header in headers:
         print(topic)
         for question, answer in headers[topic][0].items():
             print("Q: " + question[2:])
