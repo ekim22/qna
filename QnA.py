@@ -1,5 +1,6 @@
 import sys, shutil
 import pprint as pp
+from termcolor import colored
 
 
 def check_for_len(line):
@@ -48,13 +49,12 @@ def list_questions_and_answers():
         for question, answer in topics[topic][0].items():
             print(question)
             print("   " + answer)
-            print("\n")
 
 
 def list_qna_for_topic():
     my_printer = pp.PrettyPrinter(indent=4)
     for topic in topics:
-        print(topic)
+        print(topic.upper())
         for question, answer in topics[topic][0].items():
             print("Q: " + question[2:])
             my_printer.pprint("A: " + answer[2:])
@@ -92,8 +92,11 @@ def add_answers():
 def pose_questions():
     # Default behavior should be list first topic and its set of questions,
     # allow inputting an answer, present next question and so on until all sets
-    # are done.
-    print("Select mode \n1. Default")
+    # are done. 
+    # TODO: adding store_text.py's fill in the blank as a mode.
+    # TODO: adding a multiple choice mode.
+    # TODO: adding a matching a to q or q to a mode.
+    print("Select mode: \n1. Default")
     mode = input()
     if mode == "1":
         default()
@@ -105,15 +108,29 @@ def default():
     my_printer = pp.PrettyPrinter(indent=2)
     my_answers = {}
     for topic in topics:
-        print("=" * len(topic) + topic.upper() + "=" * len(topic))
-        acknowledge = input("Skip? (y/n) ")
+        print_topic(topic)
+        acknowledge = input("Skip topic? (y/n) ")
         if acknowledge == "n" or not acknowledge:
             for index, question in enumerate(topics[topic][0].keys()):
-                print(f"Question {index + 1}: {question}")
+                q = colored("Question " + str(index + 1) + ": " + question,
+                            'yellow')
+                print(f"{q}")
                 ans = input()
                 my_answers[question] = ans
-    my_printer.pprint(my_answers)
-
+    for topic in topics:
+        print_topic(topic)
+        acknowledge = input("Review answers? (y/n) ")
+        if acknowledge == 'y' or not acknowledge:
+            for question, answer in topics[topic][0].items():
+                try:
+                    if my_answers[question]:
+                        print(colored(question, 'yellow'))
+                        print(colored("ANS: ", 'green') + answer[3:])
+                        print(colored("RES: ", 'magenta') + my_answers[question])
+                except KeyError:
+                    my_answers[question] = ""
+                    continue
+       
 
 topics = {}  # A class should be made for a file and this should be an attr.
 
@@ -143,12 +160,13 @@ with open(sys.argv[1]) as f:
                     add_answers()
                 elif check_for_len(line) and check_for_numeric(line):
                     add_answers()
+                # TODO: Handling code sections that start with ```.
 
 
 while True:
     print(
         "Main Menu \n1. All \n2. Questions \n3. Answers \n4. Q&A's \n5."
-        " topics \n6. Q&A per topic\n"
+        " Topics \n6. Q&A per topic\n"
     )
     choice = input("Selection: ")
     if choice == "1":
