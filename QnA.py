@@ -125,7 +125,7 @@ def default():
                 try:
                     if my_answers[question]:
                         print(colored(question, 'yellow'))
-                        print(colored("ANS: ", 'green') + answer[3:])
+                        print(colored("ANS: ", 'green') + answer[2:])
                         print(colored("RES: ", 'magenta') + my_answers[question])
                 except KeyError:
                     my_answers[question] = ""
