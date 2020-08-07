@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/home/ethan/miniconda3/envs/qna/bin/python3
 
 import sys, shutil, subprocess
 import re
@@ -71,17 +71,35 @@ def clear_screen():
         _ = subprocess.run(["echo", "-en", "\e[3J"])
 
 
+def print_main_menu():
+    top_left = colored(u'\u2554', attrs=['bold'])
+    top_right = colored(u'\u2557', attrs=['bold'])
+    horz_pipe = colored(u'\u2550', attrs=['bold'])
+    vert_pipe = colored(u'\u2551', attrs=['bold'])
+    bottom_left = colored(u'\u255a', attrs=['bold'])
+    bottom_right = colored(u'\u255d', attrs=['bold'])
+    main_menu = colored(" Main Menu ", attrs=['bold'])
+    print(top_left + horz_pipe * 11 + top_right)
+    print(vert_pipe + main_menu + vert_pipe)
+    print(bottom_left + horz_pipe * 11 + bottom_right)
+    print(
+        "1. All \n2. Questions \n3. Answers \n4. Q&A's \n5."
+        " Q&A per Subsection \n6. Sections \n7. Subsections \n8. Pose Questions \n"
+    )
+ 
+
+
 def print_topic(section, total_subsections=None):
     if total_subsections == None:
         term_columns = shutil.get_terminal_size()[0]
         print("=" * term_columns)
         # print("|" + (term_columns - 2) * " " + "|")
         print(
-            "|"
-            + (term_columns - len(section)) // 2 * " "
+            u"\u2551"
+            + (term_columns - 1 - len(section)) // 2 * " "
             + colored(section.upper(), attrs=["bold"])
-            + (term_columns - 3 - len(section)) // 2 * " "
-            + "|"
+            + (term_columns - 2 - len(section)) // 2 * " "
+            + u"\u2551"
         )
         # print("|" + (term_columns - 2) * " " + "|")
         print("=" * term_columns)
@@ -91,31 +109,37 @@ def print_topic(section, total_subsections=None):
         print("=" * term_columns)
         # print("|" + (term_columns - 2) * " " + "|")
         print(
-            "|"
-            + (term_columns - len(section)) // 2 * " "
+            u"\u2551"
+            + (term_columns - 1 - len(section)) // 2 * " "
             + colored(section.upper(), attrs=["bold"])
-            + (term_columns - 3 - len(section)) // 2 * " "
-            + "|"
+            + (term_columns - 2 - len(section)) // 2 * " "
+            + u"\u2551"
         )
         # print("|" + (term_columns - 2) * " " + "|")
         print("=" * term_columns)
 
 
-def print_subsection(subsection, total_questions=None):
+def print_subsection(subsection, total_questions=None, list_only=False):
+    # May want to standardize the way args' length is treated.
     term_columns = shutil.get_terminal_size()[0]
-    if total_questions == None:
+    if total_questions == None and list_only == False:
         print()
         print(
-            (term_columns - 1 - len(subsection)) // 2 * " "
-            + colored(subsection, attrs=["bold",])
+            (term_columns - len(subsection)) // 2 * " "
+            + colored(subsection, attrs=["bold", "underline"])
             + "\n"
         )
+    elif list_only:
+        print(
+            (term_columns - len(subsection)) // 2 * " "
+            + colored(subsection, attrs=["bold", "underline"])
+        )
     else:
+        subsection += f" [{total_questions}]"
         print()
         print(
-            (term_columns - 1 - len(subsection)) // 2 * " "
+            (term_columns - len(subsection)) // 2 * " "
             + colored(subsection, attrs=["bold",])
-            + colored(f" [{total_questions}]", attrs=["bold"])
             + "\n"
         )
 
@@ -168,11 +192,8 @@ def list_qna_for_each_section():
     my_printer = pp.PrettyPrinter(width=200)
     for section in topics:
         print_topic(section)
-        numeral = 1
-        for subsection in topics[section]:
-            rn = roman_numeral()
-            print_subsection(rn.int_to_Roman(numeral) + ". " + subsection)
-            numeral += 1
+        for index, subsection in enumerate(topics[section]):
+            print_subsection(str(index + 1) + ". " + subsection)
             for q, a in topics[section][subsection][0].items():
                 print(colored("Q: ", "cyan") + q[2:])
                 print(colored("A: ", "magenta") + a[2:])
@@ -180,18 +201,24 @@ def list_qna_for_each_section():
 
 
 def list_sections():
-    for section in topics:
+    rn = roman_numeral()
+    for index, section in enumerate(topics):
+        section = rn.int_to_Roman(index + 1) + ". " + section
         print_topic(section)
 
 
 def list_subsections():
     rn = roman_numeral()
-    for section in topics:
-        print_topic(section)
+    for index, section in enumerate(topics):
+        section_listing = rn.int_to_Roman(index + 1) + ". " + section
+        print_topic(section_listing)
         for index, subsection in enumerate(topics[section]):
-            print(
-                colored(rn.int_to_Roman(index + 1) + ". " + subsection, attrs=["bold"])
-            )
+            subsection = str(index + 1) + ". " + subsection
+            print_subsection(subsection, list_only=True)
+           # print( # TODO: Problematic placement of printing, when there
+           #        # already is a "print_subsection" function
+           #     colored(rn.int_to_Roman(index + 1) + ". " + subsection, attrs=["bold"])
+           # )
 
 
 def add_answers():
@@ -209,6 +236,20 @@ def add_answers():
         answers = " ".join(answers)
         topics[section][subsection][0][question] = answers
 
+def main_menu(choice):
+    clear_screen()
+    menu_selection = {
+        "1": list_all,
+        "2": list_questions,
+        "3": list_answers,
+        "4": list_questions_and_answers,
+        "5": list_qna_for_each_section,
+        "6": list_sections,
+        "7": list_subsections,
+        "8": pose_questions
+    }
+    return menu_selection.get(choice)()
+
 
 def pose_questions():
     # Default behavior should be list first section and its set of questions,
@@ -217,7 +258,7 @@ def pose_questions():
     # TODO: adding store_text.py's fill in the blank as a mode.
     # TODO: adding a multiple choice mode.
     # TODO: adding a matching a to q or q to a mode.
-    print("Select mode: \n1. Default \n2. By Section")
+    print("Select mode: \n0. Main Menu \n1. Default \n2. By Section")
     mode = input()
     if mode == "1":
         clear_screen()
@@ -226,9 +267,10 @@ def pose_questions():
         clear_screen()
         section = select_section()
         test_section(section)
-    elif not mode:
-        clear_screen()
-        sys.exit(0)
+    clear_screen()
+    # elif not mode:
+    #     clear_screen()
+    #     sys.exit(0)
 
 
 def default():
@@ -274,12 +316,14 @@ def select_section():
     for section in topics:
         section_list.append(section)
         print_topic(section)
-
+    print("0. Main Menu")
     for index, section in enumerate(section_list):
         print(str(index + 1) + ". " + section)
     while True:
         try:
             selection = int(input("\nSelect section for testing: "))
+            if selection == 0:
+                return 0
             return section_list[selection - 1]
         except ValueError:
             print("Invalid input.")
@@ -290,6 +334,9 @@ def select_section():
 
 
 def test_section(section):
+    if section == 0:
+        clear_screen()
+        return
     clear_screen()
     my_answers = {}
     print(colored("STARTING TESTING SESSION...", "green", "on_red", attrs=["bold"]))
@@ -331,6 +378,8 @@ def random_questions():
     # Can randomize sections
     # Can randomize subsections
     # Can randomize questions
+    # Can randomize order
+    # Can control for probability question from another section/subsection
     pass
 
 
@@ -389,36 +438,38 @@ with open(sys.argv[1]) as f:
                 # TODO: Handling code sections that start with ```.
 
 clear_screen()
-while False:
-    print(
-        "\nMain Menu \n1. All \n2. Questions \n3. Answers \n4. Q&A's \n5."
-        " Q&A per Subsection \n6. Sections \n7. Subsections \n"
-    )
-    choice = input("Selection: ")
-    if choice == "1":
-        clear_screen()
-        list_all()
-    elif choice == "2":
-        clear_screen()
-        list_questions()
-    elif choice == "3":
-        clear_screen()
-        list_answers()
-    elif choice == "4":
-        clear_screen()
-        list_questions_and_answers()
-    elif choice == "5":
-        clear_screen()
-        list_qna_for_each_section()
-    elif choice == "6":
-        clear_screen()
-        list_sections()
-    elif choice == "7":
-        clear_screen()
-        list_subsections()
-    else:
-        break
-
 while True:
-    clear_screen()
-    pose_questions()
+    print_main_menu()
+    choice = input("Selection: ")
+    if choice:
+        main_menu(choice)
+    else:
+        clear_screen()
+        sys.exit(0)
+   # if choice == "1":
+   #     clear_screen()
+   #     list_all()
+   # elif choice == "2":
+   #     clear_screen()
+   #     list_questions()
+   # elif choice == "3":
+   #     clear_screen()
+   #     list_answers()
+   # elif choice == "4":
+   #     clear_screen()
+   #     list_questions_and_answers()
+   # elif choice == "5":
+   #     clear_screen()
+   #     list_qna_for_each_section()
+   # elif choice == "6":
+   #     clear_screen()
+   #     list_sections()
+   # elif choice == "7":
+   #     clear_screen()
+   #     list_subsections()
+   # elif choice == "8":
+   #     clear_screen()
+   #     pose_questions()
+   # else:
+   #     clear_screen()
+   #     sys.exit(0)
