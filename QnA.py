@@ -1,6 +1,6 @@
 #!/home/ethan/miniconda3/envs/qna/bin/python3
 
-import sys, shutil, subprocess
+import sys, shutil, subprocess, shlex
 import re
 import pprint as pp
 from os import system, name
@@ -19,6 +19,16 @@ class roman_numeral:
                 num -= val[i]
             i += 1
         return roman_num
+
+
+def qna_figlet():
+    # figlet_process = subprocess.run(['figlet', '-f', 'alligator.flf', 'QNA'],
+    #                         stdout=subprocess.PIPE)
+    # toilet_process = subprocess.run(['toilet', '-f', 'term', '--gay',
+    #                                figlet_process.stdout])
+    toilet_cmd = shlex.split("toilet -f isometric3 -F gay 'QNA'")
+    toilet_process = subprocess.run(toilet_cmd)
+    print()
 
 
 def check_for_len(line):
@@ -126,13 +136,13 @@ def print_subsection(subsection, total_questions=None, list_only=False):
         print()
         print(
             (term_columns - len(subsection)) // 2 * " "
-            + colored(subsection, attrs=["bold",])
+            + colored(subsection, attrs=["bold", "underline"])
             + "\n"
         )
     elif list_only:
         print(
             (term_columns - len(subsection)) // 2 * " "
-            + colored(subsection, attrs=["bold",])
+            + colored(subsection, attrs=["bold", "underline"])
         )
     else:
         subsection += f" [{total_questions}]"
@@ -248,7 +258,9 @@ def main_menu(choice):
         "7": list_subsections,
         "8": pose_questions
     }
-    return menu_selection.get(choice)()
+    if menu_selection.get(choice, None) is not None:
+        return menu_selection.get(choice)()
+    return
 
 
 def pose_questions():
@@ -438,6 +450,7 @@ with open(sys.argv[1]) as f:
                 # TODO: Handling code sections that start with ```.
 
 clear_screen()
+qna_figlet()
 while True:
     print_main_menu()
     choice = input("Selection: ")
