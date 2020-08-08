@@ -126,13 +126,13 @@ def print_subsection(subsection, total_questions=None, list_only=False):
         print()
         print(
             (term_columns - len(subsection)) // 2 * " "
-            + colored(subsection, attrs=["bold", "underline"])
+            + colored(subsection, attrs=["bold",])
             + "\n"
         )
     elif list_only:
         print(
             (term_columns - len(subsection)) // 2 * " "
-            + colored(subsection, attrs=["bold", "underline"])
+            + colored(subsection, attrs=["bold",])
         )
     else:
         subsection += f" [{total_questions}]"
