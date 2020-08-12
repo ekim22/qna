@@ -21,14 +21,13 @@ class roman_numeral:
         return roman_num
 
 
-def qna_figlet():
+def qna_banner():
     # figlet_process = subprocess.run(['figlet', '-f', 'alligator.flf', 'QNA'],
     #                         stdout=subprocess.PIPE)
     # toilet_process = subprocess.run(['toilet', '-f', 'term', '--gay',
     #                                figlet_process.stdout])
     toilet_cmd = shlex.split("toilet -f isometric3 -F gay 'QNA'")
     toilet_process = subprocess.run(toilet_cmd)
-    print()
 
 
 def check_for_len(line):
@@ -93,8 +92,9 @@ def print_main_menu():
     print(vert_pipe + main_menu + vert_pipe)
     print(bottom_left + horz_pipe * 11 + bottom_right)
     print(
-        "1. All \n2. Questions \n3. Answers \n4. Q&A's \n5."
-        " Q&A per Subsection \n6. Sections \n7. Subsections \n8. Pose Questions \n"
+        "1. List Books \n2. Questions \n3. Answers \n4. Q&A's \n5."
+        " Q&A per Subsection \n6. Sections \n7. Subsections \n8. Start qna"
+        " Session \n"
     )
  
 
@@ -136,13 +136,13 @@ def print_subsection(subsection, total_questions=None, list_only=False):
         print()
         print(
             (term_columns - len(subsection)) // 2 * " "
-            + colored(subsection, attrs=["bold", "underline"])
+            + colored(subsection, attrs=["bold",])
             + "\n"
         )
     elif list_only:
         print(
             (term_columns - len(subsection)) // 2 * " "
-            + colored(subsection, attrs=["bold", "underline"])
+            + colored(subsection, attrs=["bold",])
         )
     else:
         subsection += f" [{total_questions}]"
@@ -162,6 +162,12 @@ def print_end_of_session(session_type):
         + colored(done_stmt, attrs=["blink", "bold"])
         + (term_columns - len(done_stmt)) // 2 * "-"
     )
+
+
+def list_books():
+    # Need a way to add/remove books, and to save that information to a file.
+    # It's from that file this function will load the list.
+    pass
 
 
 def list_all():
@@ -438,7 +444,7 @@ with open(sys.argv[1]) as f:
                         line = next(f)
                     question = " ".join(questions)
                     if subsection == "":
-                        subsection = "Introduction"
+                        subsection = "Introduction to " + section 
                         add_subsection(subsection)
                         topics[section][subsection][0][question] = ""
                     else:
@@ -450,7 +456,7 @@ with open(sys.argv[1]) as f:
                 # TODO: Handling code sections that start with ```.
 
 clear_screen()
-qna_figlet()
+qna_banner()
 while True:
     print_main_menu()
     choice = input("Selection: ")
