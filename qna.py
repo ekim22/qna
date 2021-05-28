@@ -519,30 +519,3 @@ while True:
     else:
         clear_screen()
         sys.exit(0)
-# if choice == "1":
-#     clear_screen()
-#     list_all()
-# elif choice == "2":
-#     clear_screen()
-#     list_questions()
-# elif choice == "3":
-#     clear_screen()
-#     list_answers()
-# elif choice == "4":
-#     clear_screen()
-#     list_questions_and_answers()
-# elif choice == "5":
-#     clear_screen()
-#     list_qna_for_each_section()
-# elif choice == "6":
-#     clear_screen()
-#     list_sections()
-# elif choice == "7":
-#     clear_screen()
-#     list_subsections()
-# elif choice == "8":
-#     clear_screen()
-#     pose_questions()
-# else:
-#     clear_screen()
-#     sys.exit(0)
