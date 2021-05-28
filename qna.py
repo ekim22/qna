@@ -1,4 +1,3 @@
-#!/home/ethan/miniconda3/envs/qna/bin/python3
 import pprint as pp
 import re
 import shlex
