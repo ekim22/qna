@@ -18,3 +18,22 @@ Just a basic terminal note-processing app in question and answer format.
 
 ## Given answer vs true answer for questions that were answered in review
 ![end](doc/img/Snipaste_2021-05-28_15-24-49.png)
+
+---
+# Also usable in mobile, if a shell is available (e.g. blinksh or termux)
+
+![termux](doc/img/Screenshot_20200810-174205_Termux.jpg)
+
+![termux](doc/img/Screenshot_20200810-174713_Termux.jpg)
+
+![termux](doc/img/Screenshot_20200816-185227_Termux.jpg)
+
+![termux](doc/img/Screenshot_20200816-190006_Termux.jpg)
+
+![termux](doc/img/Screenshot_20200816-190013_Termux.jpg)
+
+![termux](doc/img/Screenshot_20200816-190021_Termux.jpg)
+
+![termux](doc/img/Screenshot_20200816-190031_Termux.jpg)
+
+
